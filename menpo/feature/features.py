@@ -6,6 +6,7 @@ scipy_gaussian_filter = None  # expensive
 
 from .base import ndfeature, winitfeature, imgfeature
 from ._gradient import gradient_cython
+from ._distance_transform_cython import distance_transform_cython
 from .windowiterator import WindowIterator, WindowIteratorResult
 
 
@@ -71,6 +72,58 @@ def gradient(pixels):
         return gradient_cython(pixels)
     else:
         return _np_gradient(pixels)
+
+
+@ndfeature
+def distance_transform(pixels, def_coef, anchor, to_shape=None, step=1):
+    r"""
+    Calculates the Generalised Distance Transform (GDT) of an input image (array).
+    The GDT applies a min convolution of an arbitrary quadratic function ax^2 + bx.
+
+    Parameters
+    ----------
+    pixels : ``(X, Y)`` `ndarray`
+        An 2D array, intrepreted as the two-dimensional pixels.
+    def_coef: `tuple` or `list` or `ndarray`
+        def_coef should contain a 4 element object that contains the
+        deformation (cost) coefficients for the pixels.
+        Specifically, it should have the format:
+            (a_x, b_x, a_y, b_y) with a_x, a_y != 0,
+        where a and b are the coefficients of the quadratic
+        function ax^2 + bx.
+    anchor: `tuple` or `list` or `ndarray`
+        A 2 element object containing the anchor position (y, x), which
+        indicates the relative 'nominal' position of the child
+        with respect to the parent position.
+    to_shape: `2-tuple` or `list` or `ndarray`, optional
+        If not None, it defines the shape of the output features.
+    step: `int`, optional
+        The step for the distance transform function.
+
+    Returns
+    -------
+    msg: `ndarray`
+        The  deformation cost/score for the pixels.
+    Ix: `dict`
+        Contains the x coordinates for each part from the Generalised Distance Transform.
+    Iy: `dict`
+        Contains the y coordinates for each part from the Generalised Distance Transform.
+
+    Raises
+    ------
+    RuntimeError
+        If the input array is different than 2 dimensional.
+    """
+    if to_shape is None:
+        (Ny, Nx) = pixels.shape
+    else:
+        (Ny, Nx) = to_shape
+    if (pixels.ndim) == 2:  # 2D Image
+        msg, Ix, Iy = distance_transform_cython(pixels, np.array(def_coef),
+                                                anchor[1], anchor[0], Nx, Ny, step)
+        return msg, Ix, Iy
+    else:
+        raise RuntimeError('Not implemented for arrays other than 2D.')
 
 
 @ndfeature

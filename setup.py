@@ -70,6 +70,7 @@ cython_modules = [
                              'menpo/feature/cpp/HOG.cpp',
                              'menpo/feature/cpp/LBP.cpp']),
     build_extension_from_pyx('menpo/feature/_gradient.pyx'),
+    build_extension_from_pyx('menpo/feature/_distance_transform_cython.pyx'),
     build_extension_from_pyx('menpo/image/patches.pyx'),
     build_extension_from_pyx('menpo/shape/mesh/normals.pyx')
 ]
