@@ -9,6 +9,7 @@ cdef extern from "cpp/shiftdt.h":
 
 cdef int eps = 10 ** (-7)
 
+# TO-DO: Investigate whether other formats (float) could be useful.
 def distance_transform_cython(double[:, :] score, double[:] w, int startx,
                               int starty, int Nx, int Ny, int step):
     cdef int sizy = score.shape[0]
@@ -17,14 +18,12 @@ def distance_transform_cython(double[:, :] score, double[:] w, int startx,
     ax, bx, ay, by = w
     assert(np.abs(ax) > eps)  # ax, ay should be non-zero.
     assert(np.abs(ay) > eps)
-    startx -= 1   # due to python numbering (conversion to c).
-    starty -= 1   # due to python numbering (conversion to c).
 
     cdef np.ndarray[double, ndim=2] M = np.zeros((Ny, Nx), dtype=np.double)
     cdef np.ndarray[int, ndim=2] Ix = np.empty((Ny, Nx), dtype=np.int32)
     cdef np.ndarray[int, ndim=2] Iy = np.empty((Ny, Nx), dtype=np.int32)
-    cdef np.ndarray[double, ndim=1] tmpM = np.zeros((Nx * sizy, ), dtype=np.double)
-    cdef np.ndarray[int, ndim=1] tmpIx = np.zeros((Nx * sizy, ), dtype=np.int32)
+    cdef np.ndarray[double, ndim=1] tmpM = np.zeros((Nx * sizy,), dtype=np.double)
+    cdef np.ndarray[int, ndim=1] tmpIx = np.zeros((Nx * sizy,), dtype=np.int32)
     cdef int x, y
 
     for y in range(sizy):

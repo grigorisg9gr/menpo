@@ -18,7 +18,7 @@ void dt1d(double *src, double *dst, int *ptr, int step, int len, double a,
           double b, int dshift, int dlen, double dstep) {
   int   *v = new int[len];
   float *z = new float[len+1];
-  int k = 0, q, diff;
+  int k = 0, q, diff, i, j;
   float s;
 
   v[0] = 0;
@@ -42,12 +42,13 @@ void dt1d(double *src, double *dst, int *ptr, int step, int len, double a,
    k = 0;
    q = dshift;
 
-   for (int i=0; i <= dlen-1; i++) {
+   for (i=0; i <= dlen-1; i++) {
      while (z[k+1] < q)
        k++;
      diff = q - v[k];
-     dst[i * step] = a * square(diff) + b * diff + src[v[k] * step];
-     ptr[i * step] = v[k];
+     j = i * step;
+     dst[j] = a * square(diff) + b * diff + src[v[k] * step];
+     ptr[j] = v[k];
      q += dstep;
   }
 
